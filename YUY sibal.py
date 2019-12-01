@@ -8,7 +8,7 @@ import numpy as np
 # import modules
 
 
-def is_white(color_code):
+def is_white(color_code: int):
     return color_code == 255
 
 
@@ -39,62 +39,59 @@ def finish_program(video_capture):
     cv.destroyAllWindows()
 
 
+def setup_camera():
+    image = jm.cap
+    image.set(cv.CAP_PROP_FRAME_WIDTH, 1280)
+    image.set(cv.CAP_PROP_FRAME_HEIGHT, 720)
+    return image
+
+
 # initial condition
-img = jm.cap
-img.set(cv.CAP_PROP_FRAME_WIDTH, 1280)
-img.set(cv.CAP_PROP_FRAME_HEIGHT, 720)
+img = setup_camera()
+
+
+def erode_dilate(threshold, kernel_input):
+    threshold = cv.erode(threshold, kernel_input, iterations=1)
+    threshold = cv.dilate(threshold, kernel_input, iterations=1)
+    return threshold
+
+
+def set_angle_from(ratio_input):
+    ANGLE_MAX = 130
+    ANGLE_MIN = 50
+    RATIO_MODIFIER = 20
+
+    if ratio_input > 0:
+        angle_destination = min(ANGLE_MAX, 90.0 + ratio_input * RATIO_MODIFIER)
+        print(ratio_input, angle_destination, 0.2 - abs(ratio_input / 100))
+        jm.set_angle(angle_destination)
+    else:
+        angle_destination = max(ANGLE_MIN, 90.0 + ratio_input * RATIO_MODIFIER)
+        print(ratio_input, angle_destination, 0.2 - abs(ratio_input / 100))
+        jm.set_angle(angle_destination)
+
 
 while True:
-    # read image
     ret, frame = img.read()
-    cv.imshow("VideoFrame", frame)
+
     if cv.waitKey(1) > 0:
         break
-    # 일정 크기 이상 밝기 -> 255로 일정하게
+
+    cv.imshow("VideoFrame", frame)
+
     _, thr = cv.threshold(frame, 240, 255, cv.THRESH_BINARY)
-
-    # color -> gray
     thr = cv.cvtColor(thr, cv.COLOR_BGR2GRAY)
-
-    # erosion, dilation
     kernel = np.ones((10, 10), np.uint8)
-    thr = cv.erode(thr, kernel, iterations=1)
-    thr = cv.dilate(thr, kernel, iterations=1)
+    thr = erode_dilate(thr, kernel)
 
-    # show image
     cv.imshow('Binary', thr)
 
-    # setup values
     height, width = thr.shape
-    Lave, Rave = white_dispersion_average(thr, height, width)
+    left_average_result, right_average_result = white_dispersion_average(thr, height, width)
 
-    # case 1
-    ratio = Rave / Lave
-    ratio = m.log2(ratio)
-    if ratio > 0:
-        print(ratio, min(120.0, 90.0 + ratio * 20.0), 0.2 - m.fabs(ratio / 100))
-        jm.set_angle(min(120.0, 90.0 + ratio * 20.0))
-    else:
-        print(ratio, max(60.0, 90.0 + ratio * 20.0), 0.2 - m.fabs(ratio / 100))
-        jm.set_angle(max(60.0, 90.0 + ratio * 20.0))
-    jm.set_throttle(0.3 - m.fabs(ratio / 100))
-
-    # case 2
-    # ratio = Rave - Lave
-    # print(ratio)
-
-    # case 3
-    # ratio (already defined)
-    # if ratio>0: 90+alpha
-    # else: 90-alpha
-
-    # case 4
-
-    # default : 양수 -> 오른쪽, 음수 -> 왼쪽, ratio = 0 -> 90도
-
-# img = cv.imread('sample1.jpg', cv.IMREAD_GRAYSCALE)
-# cv.imshow('xxx', img) // 담 작성 - 샘플 이미지 입출력 코드
+    ratio = m.log2(right_average_result / left_average_result)
+    set_angle_from(ratio)
+    jm.set_throttle(0.3 - abs(ratio / 100))
 
 cv.waitKey(0)
-
 finish_program(img)

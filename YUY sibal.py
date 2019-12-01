@@ -1,9 +1,40 @@
 import numpy as np
 import cv2 as cv
 import math as m
-import time
 import jetson_nano_move as jm
 ##import modules
+
+def doIt(thr, height, width):
+    Rave = 0
+    Lave = 0
+    Ltemp = 0
+    Rtemp = 0
+    temp = 0
+    for i in range(height//2, height):
+        Ridx = int(width)
+        Lidx = int(0)
+        # range -> white check
+        for j in range(width // 2, 0, -1):
+            if thr[i][j] == 255:
+                Lidx = j
+                temp = 1
+                break
+        if temp == 1:
+            Ltemp = 1
+        temp = 0
+        for j in range(width // 2, width, 1):
+            if thr[i][j] == 255:
+                Ridx = j
+                temp = 1
+                break
+        if temp == 1:
+            Rtemp = 1
+        temp = 0
+        Lidx = float(width // 2 - Lidx)
+        Ridx = float(Ridx - width // 2)
+        Rave += Ridx
+        Lave += Lidx
+    return Lave, Rave, Ltemp, Rtemp
 
 # initial condition
 img = jm.cap
@@ -33,39 +64,8 @@ while True:
 
     # setup values
     height, width = thr.shape
-    Rave = 0
-    Lave = 0
-    Ltemp = 0
-    Rtemp = 0
-    temp = 0
-
-    # until (2/3, 1)
-    for i in range(2 * height // 3, height):
-        Ridx = int(width)
-        Lidx = int(0)
-        # range -> white check
-        for j in range(width // 2, 0, -1):
-            if thr[i][j] == 255:
-                Lidx = j
-                temp = 1
-                break
-        if temp == 1:
-            Ltemp = 1
-        temp = 0
-        for j in range(width // 2, width, 1):
-            if thr[i][j] == 255:
-                Ridx = j
-                temp = 1
-                break
-        if temp == 1:
-            Rtemp = 1
-        temp = 0
-        Lidx = float(width // 2 - Lidx)
-        Ridx = float(Ridx - width // 2)
-        Rave += Ridx
-        Lave += Lidx
-        # x = Lidx / Ridx
-        # print(i, Lidx, Ridx, x)
+    Lave, Rave, Ltemp, Rtemp = doIt(thr, height, width)
+    
     # 만약 검출되지 않았다면 break -> 종료
     # Ltemp, Rtemp -> 한번이라도 흰색이 검출되면 1, 한번도 검출이 안되면 0, temp -> 각각의 줄에서 흰색이 검출되면 1, 검출이 되지 않으면 0
     if Ltemp == 0 or Rtemp == 0:
@@ -73,26 +73,27 @@ while True:
         jm.set_throttle(0)
         break
 
-    #case 1
+    # case 1
     ratio = Rave / Lave
-    print(ratio)
     ratio = m.log2(ratio)
-    jm.set_angle(90+ratio*2.5)
+    if ratio>0:
+        print(ratio, min(120.0, 90.0 + ratio * 20.0), 0.2 - m.fabs(ratio / 100))
+        jm.set_angle(min(120.0, 90.0 + ratio * 20.0))
+    else:
+        print(ratio, max(60.0, 90.0 + ratio * 20.0), 0.2 - m.fabs(ratio / 100))
+        jm.set_angle(max(60.0, 90.0 + ratio * 20.0))
     jm.set_throttle(0.3-m.fabs(ratio/100))
 
-    # 시간 delay (0.1초단위)
-    time.sleep(0.1)
+    # case 2
+    # ratio = Rave - Lave
+    # print(ratio)
 
-    #case 2
-    #ratio = Rave - Lave
-    #print(ratio)
+    # case 3
+    # ratio (already defined)
+    # if ratio>0: 90+alpha
+    # else: 90-alpha
 
-    #case 3
-    #ratio (already defined)
-    #if ratio>0: 90+alpha
-    #else: 90-alpha
-
-    #case 4
+    # case 4
 
 
     # default : 양수 -> 오른쪽, 음수 -> 왼쪽, ratio = 0 -> 90도

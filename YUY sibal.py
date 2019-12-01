@@ -6,7 +6,7 @@ import jetson_nano_move as jm
 ##import modules
 
 # initial condition
-img = cap
+img = jm.cap
 # img = cv.VideoCapture(0)
 img.set(cv.CAP_PROP_FRAME_WIDTH, 1280)
 img.set(cv.CAP_PROP_FRAME_HEIGHT, 720)

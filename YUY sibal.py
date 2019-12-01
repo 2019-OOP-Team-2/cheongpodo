@@ -1,10 +1,13 @@
-import numpy as np
-import cv2 as cv
 import math as m
+
+import cv2 as cv
 import jetson_nano_move as jm
+import numpy as np
+
+
 ##import modules
 
-def doIt(thr, height, width):
+def check_location(thr, height, width):
     Rave = 0
     Lave = 0
     for i in range(height//2, height):
@@ -53,7 +56,7 @@ while True:
 
     # setup values
     height, width = thr.shape
-    Lave, Rave = doIt(thr, height, width)
+    Lave, Rave = check_location(thr, height, width)
 
     # case 1
     ratio = Rave / Lave

@@ -6,9 +6,10 @@ import jetson_nano_move as jm
 ##import modules
 
 # initial condition
-img = cv.VideoCapture(0)
-img.set(cv.CAP_PROP_FRAME_WIDTH, 720)
-img.set(cv.CAP_PROP_FRAME_HEIGHT, 960)
+img = cap
+# img = cv.VideoCapture(0)
+img.set(cv.CAP_PROP_FRAME_WIDTH, 1280)
+img.set(cv.CAP_PROP_FRAME_HEIGHT, 720)
 
 while True:
     # read image
@@ -38,8 +39,8 @@ while True:
     Rtemp = 0
     temp = 0
 
-    # until (3/4, 1)
-    for i in range(3 * height // 4, height):
+    # until (2/3, 1)
+    for i in range(2 * height // 3, height):
         Ridx = int(width)
         Lidx = int(0)
         # range -> white check

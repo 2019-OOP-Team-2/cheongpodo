@@ -7,9 +7,6 @@ import jetson_nano_move as jm
 def doIt(thr, height, width):
     Rave = 0
     Lave = 0
-    Ltemp = 0
-    Rtemp = 0
-    temp = 0
     for i in range(height//2, height):
         Ridx = int(width)
         Lidx = int(0)
@@ -17,24 +14,16 @@ def doIt(thr, height, width):
         for j in range(width // 2, 0, -1):
             if thr[i][j] == 255:
                 Lidx = j
-                temp = 1
                 break
-        if temp == 1:
-            Ltemp = 1
-        temp = 0
         for j in range(width // 2, width, 1):
             if thr[i][j] == 255:
                 Ridx = j
-                temp = 1
                 break
-        if temp == 1:
-            Rtemp = 1
-        temp = 0
         Lidx = float(width // 2 - Lidx)
         Ridx = float(Ridx - width // 2)
         Rave += Ridx
         Lave += Lidx
-    return Lave, Rave, Ltemp, Rtemp
+    return Lave, Rave
 
 # initial condition
 img = jm.cap
@@ -64,14 +53,7 @@ while True:
 
     # setup values
     height, width = thr.shape
-    Lave, Rave, Ltemp, Rtemp = doIt(thr, height, width)
-    
-    # 만약 검출되지 않았다면 break -> 종료
-    # Ltemp, Rtemp -> 한번이라도 흰색이 검출되면 1, 한번도 검출이 안되면 0, temp -> 각각의 줄에서 흰색이 검출되면 1, 검출이 되지 않으면 0
-    if Ltemp == 0 or Rtemp == 0:
-        jm.set_angle(90)
-        jm.set_throttle(0)
-        break
+    Lave, Rave = doIt(thr, height, width)
 
     # case 1
     ratio = Rave / Lave

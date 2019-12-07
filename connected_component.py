@@ -1,44 +1,28 @@
-# -*- coding: utf-8 -*-
 import cv2
 import numpy as np
 
-image = cv2.imread("lane.jpeg", cv2.IMREAD_COLOR)
 
-image = image[image.shape[0] // 2:, :]
-
-blurred = cv2.GaussianBlur(image, (5, 5), 0)
-gray = cv2.cvtColor(blurred, cv2.COLOR_BGR2GRAY)
-_, edge = cv2.threshold(gray, 252, 255, cv2.THRESH_BINARY)
-edge = cv2.morphologyEx(edge, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
-
-nlabels, labels, stats, centroids = cv2.connectedComponentsWithStats(edge)
-
-# Map component labels to hue val
-label_hue = np.uint8(179 * labels / np.max(labels))
-blank_ch = 255 * np.ones_like(label_hue)
-labeled_img = cv2.merge([label_hue, blank_ch, blank_ch])
-
-# cvt to BGR for display
-labeled_img = cv2.cvtColor(labeled_img, cv2.COLOR_HSV2BGR)
-
-# set bg label to black
-labeled_img[label_hue == 0] = 0
-cv2.imshow("result", labeled_img)
-cv2.waitKey(0)
-
-for i in range(nlabels):
-    if not i:
-        continue
-    area = stats[i, cv2.CC_STAT_AREA]
-    center_x = int(centroids[i, 0])
-    center_y = int(centroids[i, 1])
-    left = stats[i, cv2.CC_STAT_LEFT]
-    top = stats[i, cv2.CC_STAT_TOP]
-    width = stats[i, cv2.CC_STAT_WIDTH]
-    height = stats[i, cv2.CC_STAT_HEIGHT]
-
-    if area > 10000:
-        cv2.circle(labeled_img, (center_x, center_y), 5, (255, 255, 255), 1)
-
-cv2.imshow("result", labeled_img)
-cv2.waitKey(0)
+def search_lane_center(image):
+    image = image[image.shape[0] // 2:, :]  # bottom half
+    b, g, r = cv2.split(cv2.GaussianBlur(image, (5, 5), 0))
+    _, edge = cv2.threshold(cv2.bitwise_and(cv2.bitwise_and(b, g), r), 217, 255, cv2.THRESH_BINARY)
+    edge = cv2.morphologyEx(edge, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
+    num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(edge)
+    # Map component labels to hue val
+    label_hue = np.uint8(179 * labels / np.max(labels))
+    blank_ch = 255 * np.ones_like(label_hue)
+    labeled_img = cv2.merge([label_hue, blank_ch, blank_ch])
+    # cvt to BGR for display
+    labeled_img = cv2.cvtColor(labeled_img, cv2.COLOR_HSV2BGR)
+    # set bg label to black
+    labeled_img[label_hue == 0] = 0
+    center_list = []
+    for i in range(1, num_labels):
+        area = stats[i, cv2.CC_STAT_AREA]
+        center_point = centroids[i].astype(int)
+        center_coord = [center_point[0], center_point[1], area]
+        center_list.append(center_coord)
+    center_list.sort(key=lambda e: -e[2])
+    center_list = center_list[:2]
+    center_list.sort(key=lambda e: e[0])
+    return center_list

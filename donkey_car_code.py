@@ -3,6 +3,7 @@ import math as m
 import cv2 as cv
 
 import jetson_nano_move as jm
+from connected_component import search_lane_center
 
 
 def is_white(color_code: int) -> bool:
@@ -36,16 +37,13 @@ def finish_program(video_capture: cv.VideoCapture) -> None:
     cv.destroyAllWindows()
 
 
-def steer_dampener(val: float) -> float:
+def steer_dampener(val: float) -> float:  # high val = left.
     return (2 * jm.MAX_STEER_DEV / m.pi) * m.atan(val) + jm.STRAIGHT_ANGLE
 
 
-def set_angle_from(left: float, right: float) -> None:
-    c1 = 1
-    c2 = 0.5
-    val = c1 * (m.e ** (c2 * left) - m.e ** (c2 * right))
-    print(left, right, val)
-    jm.set_angle(steer_dampener(val))
+def set_angle_from(centers: list) -> None:
+    left_coord = tuple(centers[0, :2])
+    right_coord = tuple(centers[1, :2])
 
 
 # camera init
@@ -54,16 +52,16 @@ img = jm.cap
 while True:
     _, image_raw = img.read()
     image_raw = cv.resize(image_raw, (640, 360), interpolation=cv.INTER_AREA)
-    image_binary = cv.cvtColor(image_raw, cv.COLOR_BGR2GRAY)
-    _, image_binary = cv.threshold(image_binary, 190, 255, cv.THRESH_BINARY)
-    image_binary = cv.morphologyEx(image_binary, cv.MORPH_CLOSE, cv.getStructuringElement(cv.MORPH_ELLIPSE, (3, 3)))
-    cv.imshow("Binary", image_binary)
+    image_search = image_raw.clone()
+    center_list = search_lane_center(image_search)
+    for a in center_list:
+        cv.circle(image_search, (a[0], a[1]), 5, (255, 255, 255), 1)
+    cv.imshow("Searched", image_search)
 
     if cv.waitKey(30) > 0:
         break
 
-    left_average_result, right_average_result = white_dispersion_average(image_binary)
-    set_angle_from(left_average_result, right_average_result)
+    set_angle_from(center_list)
     jm.set_throttle(0.15)
 
 finish_program(img)

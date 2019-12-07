@@ -30,8 +30,8 @@ def initial_value(img, height, width, WHITE):
 
 
 def dfs(img, height, width, WHITE, left_idx, right_idx):
-    left_sum = (width/2 - left_idx)
-    right_sum = (right_idx - width/2)
+    left_sum = (width / 2 - left_idx)
+    right_sum = (right_idx - width / 2)
 
     for this_height in range(height - 2, height * 2 // 3, -1):
         left_sum += (width / 2 - left_idx)
@@ -56,6 +56,7 @@ def dfs(img, height, width, WHITE, left_idx, right_idx):
                 right_idx = this_width
                 break
     return left_sum, right_sum
+
 
 img = 1
 WHITE = 255

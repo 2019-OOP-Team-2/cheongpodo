@@ -41,10 +41,10 @@ def get_throttle() -> float:
 
 
 def set_angle(val: float) -> None:
-    MIN_VAL = STRAIGHT_ANGLE - MAX_STEER_DEV
-    MAX_VAL = STRAIGHT_ANGLE + MAX_STEER_DEV
-    if val < MIN_VAL or val > MAX_VAL:
-        raise ValueError('angle must be a number of [%.1f, %.1f] !' % (MIN_VAL, MAX_VAL))
+    min_val = STRAIGHT_ANGLE - MAX_STEER_DEV
+    max_val = STRAIGHT_ANGLE + MAX_STEER_DEV
+    if val < min_val or val > max_val:
+        raise ValueError('angle must be a number of [%.1f, %.1f] !' % (min_val, max_val))
     __servo_kit.servo[1].angle = val
 
 

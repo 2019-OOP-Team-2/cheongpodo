@@ -40,9 +40,9 @@ def steer_dampener(val: float) -> float:
 
 
 def set_angle_from(left: float, right: float) -> None:
-    C1 = 1
-    C2 = 10
-    val = C1 * (m.e ** (C2 * left) - m.e ** (C2 * right))
+    c1 = 1
+    c2 = 10
+    val = c1 * (m.e ** (c2 * left) - m.e ** (c2 * right))
     print(left, right, val)
     jm.set_angle(steer_dampener(val))
 

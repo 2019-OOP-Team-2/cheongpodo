@@ -47,30 +47,27 @@ def setup_camera():
     return image
 
 
-# initial condition
-img = setup_camera()
-
-
-def erode_dilate(threshold, kernel_input):
-    threshold = cv.erode(threshold, kernel_input, iterations=1)
-    threshold = cv.dilate(threshold, kernel_input, iterations=1)
-    return threshold
+def erode_dilate(threshold_input, kernel_input):
+    threshold_input = cv.erode(threshold_input, kernel_input, iterations=1)
+    threshold_input = cv.dilate(threshold_input, kernel_input, iterations=1)
+    return threshold_input
 
 
 def set_angle_from(ratio_input):
-    ANGLE_MAX = 130
-    ANGLE_MIN = 50
+    ANGLE_STRAIGHT = 90
+    ANGLE_RANGE = 40
+    ANGLE_MAX = ANGLE_STRAIGHT + ANGLE_RANGE
+    ANGLE_MIN = ANGLE_STRAIGHT - ANGLE_RANGE
     RATIO_MODIFIER = 20
 
-    if ratio_input > 0:
-        angle_destination = min(ANGLE_MAX, 90.0 + ratio_input * RATIO_MODIFIER)
-        print(ratio_input, angle_destination, 0.2 - abs(ratio_input / 100))
-        jm.set_angle(angle_destination)
-    else:
-        angle_destination = max(ANGLE_MIN, 90.0 + ratio_input * RATIO_MODIFIER)
-        print(ratio_input, angle_destination, 0.2 - abs(ratio_input / 100))
-        jm.set_angle(angle_destination)
+    angle_destination = min(ANGLE_MAX, 90.0 + ratio_input * RATIO_MODIFIER) if ratio_input > 0 \
+        else max(ANGLE_MIN, 90.0 + ratio_input * RATIO_MODIFIER)
+    print(ratio_input, angle_destination, 0.2 - abs(ratio_input / 100))
+    jm.set_angle(angle_destination)
 
+
+# initial condition
+img = setup_camera()
 
 while True:
     ret, frame = img.read()

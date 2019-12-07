@@ -67,5 +67,4 @@ while True:
     set_angle_from(left_average_result, right_average_result)
     jm.set_throttle(0.15)
 
-cv.waitKey(0)
 finish_program(img)

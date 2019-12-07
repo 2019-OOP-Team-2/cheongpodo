@@ -41,13 +41,29 @@ def steer_dampener(val: float) -> float:  # high val = left.
     return (2 * jm.MAX_STEER_DEV / m.pi) * m.atan(val) + jm.STRAIGHT_ANGLE
 
 
-def set_angle_from(centers: list) -> None:
+def set_angle_from(centers: list) -> float:
+    car_len = 18  # cm
+    if len(centers) != 2:
+        jm.set_angle(m.atan(car_len / prev_turn))
+        return prev_turn
+
     left_coord = tuple(centers[0, :2])
     right_coord = tuple(centers[1, :2])
+
+    const = 630
+    if left_coord[0] == right_coord[0]:
+        r = 4194967296
+    else:
+        r = const / (left_coord[0] - right_coord[0])
+
+    jm.set_angle(m.atan(car_len / r))
+
+    return r
 
 
 # camera init
 img = jm.cap
+prev_turn = 0
 
 while True:
     _, image_raw = img.read()
@@ -55,13 +71,13 @@ while True:
     image_search = image_raw.clone()
     center_list = search_lane_center(image_search)
     for a in center_list:
-        cv.circle(image_search, (a[0], a[1]), 5, (255, 255, 255), 1)
+        cv.circle(image_search, (a[0], a[1]), 10, (0, 0, 0), 3)
     cv.imshow("Searched", image_search)
 
     if cv.waitKey(30) > 0:
         break
 
-    set_angle_from(center_list)
+    prev_turn = set_angle_from(center_list)
     jm.set_throttle(0.15)
 
 finish_program(img)

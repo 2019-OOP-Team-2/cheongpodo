@@ -68,11 +68,11 @@ prev_turn = 0
 while True:
     _, image_raw = img.read()
     image_raw = cv.resize(image_raw, (640, 360), interpolation=cv.INTER_AREA)
-    image_search = image_raw.clone()
-    center_list = search_lane_center(image_search)
+    image_search = image_raw.copy()
+    center_list, image_res = search_lane_center(image_search)
     for a in center_list:
-        cv.circle(image_search, (a[0], a[1]), 10, (0, 0, 0), 3)
-    cv.imshow("Searched", image_search)
+        cv.circle(image_res, (a[0], a[1]), 10, (0, 0, 0), 3)
+    cv.imshow("Searched", image_res)
 
     if cv.waitKey(30) > 0:
         break

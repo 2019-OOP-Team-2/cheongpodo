@@ -21,8 +21,9 @@ def search_lane_center(image):
         area = stats[i, cv2.CC_STAT_AREA]
         center_point = centroids[i].astype(int)
         center_coord = [center_point[0], center_point[1], area]
-        center_list.append(center_coord)
+        if area > 300:
+            center_list.append(center_coord)
     center_list.sort(key=lambda e: -e[2])
     center_list = center_list[:2]
     center_list.sort(key=lambda e: e[0])
-    return center_list
+    return center_list, edge

@@ -5,11 +5,11 @@ import cv2 as cv
 import jetson_nano_move as jm
 
 
-def is_white(color_code: int):
+def is_white(color_code: int) -> bool:
     return color_code == 255
 
 
-def white_dispersion_average(image_input):  # TODO: make this faster
+def white_dispersion_average(image_input) -> (float, float):  # TODO: make this faster
     height_input, width_input = image_input.shape
     right_average = 0
     left_average = 0
@@ -30,23 +30,16 @@ def white_dispersion_average(image_input):  # TODO: make this faster
     return 2 * left_average / width_input, 2 * right_average / width_input
 
 
-def finish_program(video_capture):
+def finish_program(video_capture: cv.VideoCapture) -> None:
     video_capture.release()
     cv.destroyAllWindows()
 
 
-def setup_camera():
-    image = jm.cap
-    image.set(cv.CAP_PROP_FRAME_WIDTH, 1280)
-    image.set(cv.CAP_PROP_FRAME_HEIGHT, 720)
-    return image
-
-
-def steer_dampener(val):
+def steer_dampener(val: float) -> float:
     return (2 * jm.MAX_STEER_DEV / m.pi) * m.atan(val) + jm.STRAIGHT_ANGLE
 
 
-def set_angle_from(left, right):
+def set_angle_from(left: float, right: float) -> None:
     C1 = 1
     C2 = 10
     val = C1 * (m.e ** (C2 * left) - m.e ** (C2 * right))
@@ -54,19 +47,18 @@ def set_angle_from(left, right):
     jm.set_angle(steer_dampener(val))
 
 
-# initial condition
-img = setup_camera()
+# camera init
+img = jm.cap
 
 while True:
     _, image_raw = img.read()
-
     image_binary = cv.cvtColor(image_raw, cv.COLOR_BGR2GRAY)
     # _, thr = cv.threshold(thr, 190, 255, cv.THRESH_BINARY)
     image_binary = cv.adaptiveThreshold(image_binary, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 15, 20)
     image_binary = cv.morphologyEx(image_binary, cv.MORPH_CLOSE, cv.getStructuringElement(cv.MORPH_ELLIPSE, (3, 3)))
 
     cv.imshow("VideoFrame", image_raw)
-    cv.imshow('Binary', image_binary)
+    cv.imshow("Binary", image_binary)
     if cv.waitKey(30) > 0:
         break
 

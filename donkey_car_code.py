@@ -1,6 +1,7 @@
 import math as m
 
 import cv2 as cv
+
 import jetson_nano_move as jm
 
 
@@ -69,21 +70,20 @@ def set_angle_from(ratio_input):
 img = setup_camera()
 
 while True:
-    ret, frame = img.read()
+    ret, image_raw = img.read()
 
-    if cv.waitKey(1) > 0:
+    image_binary = cv.cvtColor(image_raw, cv.COLOR_BGR2GRAY)
+    # _, thr = cv.threshold(thr, 190, 255, cv.THRESH_BINARY)
+    image_binary = cv.adaptiveThreshold(image_binary, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY, 15, 20)
+    image_binary = cv.morphologyEx(image_binary, cv.MORPH_CLOSE, cv.getStructuringElement(cv.MORPH_ELLIPSE, (3, 3)))
+
+    cv.imshow("VideoFrame", image_raw)
+    cv.imshow('Binary', image_binary)
+    if cv.waitKey(30) > 0:
         break
 
-    cv.imshow("VideoFrame", frame)
-
-    thr = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-    _, thr = cv.threshold(thr, 190, 255, cv.THRESH_BINARY)
-    thr = cv.morphologyEx(thr, cv.MORPH_CLOSE, cv.getStructuringElement(cv.MORPH_ELLIPSE, 3, 3))
-
-    cv.imshow('Binary', thr)
-
-    height, width = thr.shape
-    left_average_result, right_average_result = white_dispersion_average(thr, height, width)
+    height, width = image_binary.shape
+    left_average_result, right_average_result = white_dispersion_average(image_binary, height, width)
 
     ratio = m.log2(right_average_result / left_average_result)
     set_angle_from(ratio)

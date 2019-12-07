@@ -47,11 +47,11 @@ def set_angle_from(centers: list) -> float:
         r = prev_turn
         if r == 0:
             r = 0.01 ** 4
-        jm.set_angle(m.atan(car_len / r))
+        jm.set_angle(180 / m.pi * m.atan(car_len / r))
         return prev_turn
 
-    left_coord = tuple(centers[0, :2])
-    right_coord = tuple(centers[1, :2])
+    left_coord = centers[0]
+    right_coord = centers[1]
 
     const = 630
     if left_coord[0] == right_coord[0]:
@@ -59,7 +59,7 @@ def set_angle_from(centers: list) -> float:
     else:
         r = const / (left_coord[0] - right_coord[0])
 
-    jm.set_angle(m.atan(car_len / r))
+    jm.set_angle(180 / m.pi * m.atan(car_len / r))
 
     return r
 

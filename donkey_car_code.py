@@ -5,17 +5,12 @@ import cv2 as cv
 import jetson_nano_move as jm
 
 
-#
-# import modules
-
-
 def is_white(color_code: int):
     return color_code == 255
 
 
-def white_dispersion_average(image_input, height_input, width_input):
-    if type(height_input) is not int or type(width_input) is not int:
-        raise TypeError('height_input and width_input must be an int!')
+def white_dispersion_average(image_input):  # TODO: make this faster
+    height_input, width_input = image_input.shape
     right_average = 0
     left_average = 0
     for i in range(height_input // 2, height_input):
@@ -32,7 +27,7 @@ def white_dispersion_average(image_input, height_input, width_input):
                 break
         right_average += right_dispersion
         left_average += left_dispersion
-    return left_average, right_average
+    return 2 * left_average / width_input, 2 * right_average / width_input
 
 
 def finish_program(video_capture):
@@ -47,30 +42,23 @@ def setup_camera():
     return image
 
 
-def erode_dilate(threshold_input, kernel_input):
-    threshold_input = cv.erode(threshold_input, kernel_input, iterations=1)
-    threshold_input = cv.dilate(threshold_input, kernel_input, iterations=1)
-    return threshold_input
+def steer_dampener(val):
+    return (2 * jm.MAX_STEER_DEV / m.pi) * m.atan(val) + jm.STRAIGHT_ANGLE
 
 
-def set_angle_from(ratio_input):
-    ANGLE_STRAIGHT = 90
-    ANGLE_RANGE = 40
-    ANGLE_MAX = ANGLE_STRAIGHT + ANGLE_RANGE
-    ANGLE_MIN = ANGLE_STRAIGHT - ANGLE_RANGE
-    RATIO_MODIFIER = 20
-
-    angle_destination = min(ANGLE_MAX, 90.0 + ratio_input * RATIO_MODIFIER) if ratio_input > 0 \
-        else max(ANGLE_MIN, 90.0 + ratio_input * RATIO_MODIFIER)
-    print(ratio_input, angle_destination, 0.2 - abs(ratio_input / 100))
-    jm.set_angle(angle_destination)
+def set_angle_from(left, right):
+    C1 = 1
+    C2 = 10
+    val = C1 * (m.e ** (C2 * left) - m.e ** (C2 * right))
+    print(left, right, val)
+    jm.set_angle(steer_dampener(val))
 
 
 # initial condition
 img = setup_camera()
 
 while True:
-    ret, image_raw = img.read()
+    _, image_raw = img.read()
 
     image_binary = cv.cvtColor(image_raw, cv.COLOR_BGR2GRAY)
     # _, thr = cv.threshold(thr, 190, 255, cv.THRESH_BINARY)
@@ -83,11 +71,9 @@ while True:
         break
 
     height, width = image_binary.shape
-    left_average_result, right_average_result = white_dispersion_average(image_binary, height, width)
-
-    ratio = m.log2(right_average_result / left_average_result)
-    set_angle_from(ratio)
-    jm.set_throttle(0.3 - abs(ratio / 100))
+    left_average_result, right_average_result = white_dispersion_average(image_binary)
+    set_angle_from(left_average_result, right_average_result)
+    jm.set_throttle(0.15)
 
 cv.waitKey(0)
 finish_program(img)

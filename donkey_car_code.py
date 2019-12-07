@@ -38,7 +38,8 @@ def finish_program(video_capture: cv.VideoCapture) -> None:
 
 
 def steer_dampener(val: float) -> float:  # high val = left.
-    return (2 * jm.MAX_STEER_DEV / m.pi) * m.atan(val) + jm.STRAIGHT_ANGLE
+    const = 8
+    return (2 * jm.MAX_STEER_DEV / m.pi) * m.atan(val * const) + jm.STRAIGHT_ANGLE
 
 
 def set_angle_from(centers: list) -> float:
@@ -47,26 +48,27 @@ def set_angle_from(centers: list) -> float:
         r = prev_turn
         if r == 0:
             r = 0.01 ** 4
-        jm.set_angle(180 / m.pi * m.atan(car_len / r))
+        jm.set_angle(180 / m.pi * m.atan(car_len / r) + 90)
         return prev_turn
 
     left_coord = centers[0]
     right_coord = centers[1]
 
     const = 630
+
     if left_coord[0] == right_coord[0]:
         r = 4194967296
     else:
         r = const / (left_coord[0] - right_coord[0])
 
-    jm.set_angle(180 / m.pi * m.atan(car_len / r))
+    jm.set_angle(180 / m.pi * m.atan(car_len / r) + 90)
 
     return r
 
 
 # camera init
 img = jm.cap
-prev_turn = 0
+prev_turn = 4194967296
 
 while True:
     _, image_raw = img.read()

@@ -60,7 +60,7 @@ def set_angle_from(centers: list) -> float:
         r = 4194967296
     else:
         r = const / (640 - left_coord[0] - right_coord[0])
-
+    print(r)
     jm.set_angle(steer_dampener(180 / m.pi * m.atan(car_len / r)))
 
     return r

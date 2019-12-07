@@ -2,7 +2,6 @@ import math as m
 
 import cv2 as cv
 import jetson_nano_move as jm
-import numpy as np
 
 
 #
@@ -77,10 +76,9 @@ while True:
 
     cv.imshow("VideoFrame", frame)
 
-    _, thr = cv.threshold(frame, 240, 255, cv.THRESH_BINARY)
-    thr = cv.cvtColor(thr, cv.COLOR_BGR2GRAY)
-    kernel = np.ones((10, 10), np.uint8)
-    thr = erode_dilate(thr, kernel)
+    thr = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    _, thr = cv.threshold(thr, 190, 255, cv.THRESH_BINARY)
+    thr = cv.morphologyEx(thr, cv.MORPH_CLOSE, cv.getStructuringElement(cv.MORPH_ELLIPSE, 3, 3))
 
     cv.imshow('Binary', thr)
 

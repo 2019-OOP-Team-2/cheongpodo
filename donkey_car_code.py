@@ -44,7 +44,10 @@ def steer_dampener(val: float) -> float:  # high val = left.
 def set_angle_from(centers: list) -> float:
     car_len = 18  # cm
     if len(centers) != 2:
-        jm.set_angle(m.atan(car_len / prev_turn))
+        r = prev_turn
+        if r == 0:
+            r = 0.01 ** 4
+        jm.set_angle(m.atan(car_len / r))
         return prev_turn
 
     left_coord = tuple(centers[0, :2])

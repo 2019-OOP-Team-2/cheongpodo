@@ -3,11 +3,13 @@ import cv2
 import numpy as np
 
 image = cv2.imread("lane.jpeg", cv2.IMREAD_COLOR)
+
+image = image[image.shape[0] // 2:, :]
+
 blurred = cv2.GaussianBlur(image, (5, 5), 0)
 gray = cv2.cvtColor(blurred, cv2.COLOR_BGR2GRAY)
 _, edge = cv2.threshold(gray, 252, 255, cv2.THRESH_BINARY)
 edge = cv2.morphologyEx(edge, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
-
 
 nlabels, labels, stats, centroids = cv2.connectedComponentsWithStats(edge)
 
@@ -25,11 +27,11 @@ cv2.imshow("result", labeled_img)
 cv2.waitKey(0)
 
 for i in range(nlabels):
-    if i < 2:
+    if not i:
         continue
     area = stats[i, cv2.CC_STAT_AREA]
-    center_x = int(centroids[i ,0])
-    center_y = int(centroids[i ,1])
+    center_x = int(centroids[i, 0])
+    center_y = int(centroids[i, 1])
     left = stats[i, cv2.CC_STAT_LEFT]
     top = stats[i, cv2.CC_STAT_TOP]
     width = stats[i, cv2.CC_STAT_WIDTH]

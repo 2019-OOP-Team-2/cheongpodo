@@ -41,6 +41,7 @@ def get_throttle() -> float:
 
 
 def set_angle(val: float) -> None:
+    print(val)
     min_val = STRAIGHT_ANGLE - MAX_STEER_DEV
     max_val = STRAIGHT_ANGLE + MAX_STEER_DEV
     if val < min_val or val > max_val:

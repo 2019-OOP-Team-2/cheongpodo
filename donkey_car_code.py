@@ -19,9 +19,19 @@ def finish_program(video_capture: cv.VideoCapture) -> None:
     cv.destroyAllWindows()
 
 
+__dampener_coeff = 'not'
+
+
 def steer_dampener(val: float) -> float:  # high val = left.
+    global __dampener_coeff
     const = 0.8  # const
-    return (2 * jm.MAX_STEER_DEV / m.pi) * m.atan(val * const) + jm.STRAIGHT_ANGLE
+    num_deg = (2 * jm.MAX_STEER_DEV / m.pi) * m.atan(val * const) + jm.STRAIGHT_ANGLE
+    if __dampener_coeff == 'not':
+        __dampener_coeff = num_deg
+    else:
+        num_deg = num_deg * 3 / 4 + __dampener_coeff / 4
+        __dampener_coeff = num_deg / 4 + __dampener_coeff * 3 / 4
+    return num_deg
 
 
 def set_angle_from(centers_up: list, centers_low: list) -> float:

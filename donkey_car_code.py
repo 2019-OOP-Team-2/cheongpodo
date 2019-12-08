@@ -72,8 +72,8 @@ try:
             search_lane_center(image_bird[:image_bird.shape[0] // 2, :image_bird.shape[1] // 2], 1)
         list_up_right, up_right_image = \
             search_lane_center(image_bird[:image_bird.shape[0] // 2, image_bird.shape[1] // 2:], 1)
-        print(list_up_right[0])
-        list_up_right[0][0] += image_bird.shape[1] // 2
+        if len(list_up_right):
+            list_up_right[0][0] += image_bird.shape[1] // 2
         list_up = list_up_left + list_up_right
         up_image = np.concatenate((up_left_image, up_right_image), axis=1)
 
@@ -81,8 +81,8 @@ try:
             search_lane_center(image_bird[image_bird.shape[0] // 2:, :image_bird.shape[1] // 2], 1)
         list_low_right, low_image_right = \
             search_lane_center(image_bird[image_bird.shape[0] // 2:, image_bird.shape[1] // 2:], 1)
-        print(list_low_right[0])
-        list_low_right[0][0] += image_bird.shape[1] // 2
+        if len(list_low_right):
+            list_low_right[0][0] += image_bird.shape[1] // 2
         list_low = list_low_left + list_low_right
         low_image = np.concatenate((low_image_left, low_image_right), axis=1)
 

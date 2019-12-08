@@ -50,7 +50,6 @@ def set_angle_from(centers_up: list, centers_low: list) -> float:
 def debug_img_show(image_in):
     if debug:
         cv.imshow('debug', image_in)
-        cv.waitKey(1000)
 
 
 debug = True
@@ -62,22 +61,20 @@ prev_turn = m.inf
 while True:
     _, image_raw = img.read()
     image_raw = cv.resize(image_raw, (640, 360), interpolation=cv.INTER_AREA)
-    debug_img_show(image_raw)
 
     image_bird = bird_eye.bird_eye_warp(image_raw)
-    debug_img_show(image_bird)
 
     list_up, up_image = search_lane_center(image_bird[:image_bird.shape[0] // 2, :])
     list_low, low_image = search_lane_center(image_bird[image_bird.shape[0] // 2:, :])
     image_res_merge = np.concatenate((up_image, low_image), axis=0)
-    debug_img_show(image_res_merge)
 
     if debug:
         for a in list_up:
-            cv.circle(image_bird, (a[0], a[1]), 10, (63, 63, 63), 3)
+            cv.circle(image_res_merge, (a[0], a[1]), 10, (63, 63, 63), 3)
         for a in list_low:
-            cv.circle(image_bird, (a[0], a[1] + image_bird.shape[0] // 2), 10, (63, 63, 63), 3)
-    debug_img_show(image_bird)
+            cv.circle(image_res_merge, (a[0], a[1] + image_bird.shape[0] // 2), 10, (63, 63, 63), 3)
+
+    debug_img_show(image_res_merge)
 
     if cv.waitKey(30) > 0:
         break

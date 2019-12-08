@@ -10,28 +10,6 @@ def is_white(color_code: int) -> bool:
     return color_code == 255
 
 
-def white_dispersion_average(image_input) -> (float, float):
-    height_input, width_input = image_input.shape
-    right_average = 0
-    left_average = 0
-    for i in range(height_input // 2, height_input):
-        right_dispersion = width_input // 2
-        left_dispersion = width_input // 2
-        for j in range(width_input // 2, -1, -1):
-            if is_white(image_input[i][j]):
-                left_dispersion = 1 - j / (width_input // 2)
-                break
-        for j in range(width_input // 2, width_input):
-            if is_white(image_input[i][j]):
-                right_dispersion = j / (width_input // 2) - 1
-                break
-        right_average += right_dispersion
-        left_average += left_dispersion
-    left_average /= width_input / 2
-    right_average /= width_input / 2
-    return left_average, right_average
-
-
 def finish_program(video_capture: cv.VideoCapture) -> None:
     video_capture.release()
     cv.destroyAllWindows()
@@ -57,7 +35,7 @@ def set_angle_from(centers: list) -> float:
     const = 63000
 
     if 640 - left_coord[0] - right_coord[0] == 0:
-        r = 4194967296
+        r = m.inf
     else:
         r = const / (640 - left_coord[0] - right_coord[0])
     print(r)
@@ -66,24 +44,28 @@ def set_angle_from(centers: list) -> float:
     return r
 
 
+debug = False
+
 # camera init
 img = jm.cap
-prev_turn = 4194967296
+prev_turn = m.inf
 
 while True:
     _, image_raw = img.read()
     image_raw = cv.resize(image_raw, (640, 360), interpolation=cv.INTER_AREA)
     image_search = image_raw.copy()
-    center_list, image_res = search_lane_center(image_search)
+    center_list, image_res = search_lane_center(image_search[image_search.shape[0] // 2:, :])
     for a in center_list:
         cv.circle(image_res, (a[0], a[1]), 10, (0, 0, 0), 3)
-    cv.imshow("Searched", image_res)
+    if debug:
+        cv.imshow("Searched", image_res)
 
     if cv.waitKey(30) > 0:
         break
 
     prev_turn = set_angle_from(center_list)
-    continue
+    if debug:
+        continue
     jm.set_throttle(0.15)
 
 finish_program(img)

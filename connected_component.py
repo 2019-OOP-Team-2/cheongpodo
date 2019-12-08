@@ -3,10 +3,9 @@ import numpy as np
 
 
 def search_lane_center(image):
-    image = image[image.shape[0] * 3 // 4:, :]  # bottom half
     b, g, r = cv2.split(cv2.GaussianBlur(image, (5, 5), 0))
-    _, edge = cv2.threshold(cv2.bitwise_and(cv2.bitwise_and(b, g), r), 100, 255, cv2.THRESH_BINARY)
-    edge = cv2.morphologyEx(edge, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
+    _, edge = cv2.threshold(cv2.bitwise_and(cv2.bitwise_and(b, g), r), 170, 255, cv2.THRESH_BINARY)
+    edge = cv2.morphologyEx(edge, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)), iterations=3)
     num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(edge)
     # Map component labels to hue val
     label_hue = np.uint8(179 * labels / np.max(labels))

@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 
-def search_lane_center(image):
+def search_lane_center(image, num=2):
     b, g, r = cv2.split(cv2.GaussianBlur(image, (5, 5), 0))
     no_color = cv2.bitwise_and(cv2.bitwise_and(b, g), r)
     # _, edge = cv2.threshold(no_color, 100, 255, cv2.THRESH_BINARY)
@@ -28,6 +28,6 @@ def search_lane_center(image):
         if area > 300:
             center_list.append(center_coord)
     center_list.sort(key=lambda e: -e[2])
-    center_list = center_list[:2]
+    center_list = center_list[:num]
     center_list.sort(key=lambda e: e[0])
     return center_list, edge

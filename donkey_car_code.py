@@ -74,9 +74,9 @@ while True:
     up_image = np.concatenate((up_left_image, up_right_image), axis=1)
 
     list_low_left, low_image_left = \
-        search_lane_center(image_bird[image_bird.shape[0] // 2:, :image_bird.shape[1] // 2])
+        search_lane_center(image_bird[image_bird.shape[0] // 2:, :image_bird.shape[1] // 2], 1)
     list_low_right, low_image_right = \
-        search_lane_center(image_bird[image_bird.shape[0] // 2:, image_bird.shape[1] // 2:])
+        search_lane_center(image_bird[image_bird.shape[0] // 2:, image_bird.shape[1] // 2:], 1)
     list_low = list_low_left + list_low_right
     low_image = np.concatenate((low_image_left, low_image_right), axis=1)
 

@@ -15,6 +15,7 @@ def is_white(color_code: int) -> bool:
 
 def finish_program(video_capture: cv.VideoCapture) -> None:
     video_capture.release()
+    jm.set_throttle(0)
     cv.destroyAllWindows()
 
 
@@ -99,7 +100,7 @@ try:
         if debug:
             continue
 
-        jm.set_throttle(0.122)
+        jm.set_throttle(0.14)
 except KeyboardInterrupt:
     print('end trapped')
 

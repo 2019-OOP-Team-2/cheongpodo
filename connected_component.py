@@ -5,8 +5,8 @@ import numpy as np
 def search_lane_center(image):
     b, g, r = cv2.split(cv2.GaussianBlur(image, (5, 5), 0))
     no_color = cv2.bitwise_and(cv2.bitwise_and(b, g), r)
-    _, edge = cv2.threshold(no_color, 100, 255, cv2.THRESH_BINARY)
-    # edge = cv2.adaptiveThreshold(no_color, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 91, -59)
+    # _, edge = cv2.threshold(no_color, 100, 255, cv2.THRESH_BINARY)
+    edge = cv2.adaptiveThreshold(no_color, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 91, -45)
     edge = cv2.morphologyEx(edge, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3)), iterations=3)
     num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(edge)
 

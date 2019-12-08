@@ -24,7 +24,7 @@ def steer_dampener(val: float) -> float:  # high val = left.
 
 def set_angle_from(centers_up: list, centers_low: list) -> float:
     car_len = 18  # cm
-    if len(centers_up) != 2 or len(centers_low) != 2:
+    if len(centers_up) != 2:
         r = prev_turn
         if r == 0:
             r = 0.01 ** 4
@@ -52,7 +52,7 @@ def debug_img_show(image_in):
         cv.imshow('debug', image_in)
 
 
-debug = True
+debug = False
 
 # camera init
 img = jm.cap

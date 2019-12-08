@@ -100,7 +100,7 @@ try:
             continue
 
         jm.set_throttle(0.122)
-except:
+except KeyboardInterrupt:
     print('end trapped')
 
 finish_program(img)

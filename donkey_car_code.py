@@ -84,6 +84,6 @@ while True:
     if debug:
         continue
 
-    jm.set_throttle(0.14)
+    jm.set_throttle(0.122)
 
 finish_program(img)

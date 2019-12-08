@@ -53,7 +53,7 @@ def debug_img_show(image_in):
 
 
 debug = False
-
+jm.set_throttle(0)
 # camera init
 img = jm.cap
 prev_turn = m.inf
@@ -84,6 +84,6 @@ while True:
     if debug:
         continue
 
-    jm.set_throttle(0.15)
+    jm.set_throttle(0.14)
 
 finish_program(img)

@@ -1,4 +1,5 @@
 import math as m
+import time
 
 import cv2 as cv
 import numpy as np
@@ -18,7 +19,7 @@ def finish_program(video_capture: cv.VideoCapture) -> None:
 
 
 def steer_dampener(val: float) -> float:  # high val = left.
-    const = 0.8
+    const = 0.8  # const
     return (2 * jm.MAX_STEER_DEV / m.pi) * m.atan(val * const) + jm.STRAIGHT_ANGLE
 
 
@@ -54,6 +55,7 @@ def debug_img_show(image_in):
 
 debug = False
 jm.set_throttle(0)
+time.sleep(1)
 # camera init
 img = jm.cap
 prev_turn = m.inf

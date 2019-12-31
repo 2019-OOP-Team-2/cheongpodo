@@ -23,7 +23,7 @@ class Net(nn.Module):  # 640 x 360 input
         self.conv1 = nn.Conv2d(3, 6, 5)
         self.conv2 = nn.Conv2d(6, 16, 5)
         self.pool = nn.MaxPool2d(2, 2)
-        self.fc1 = nn.Linear(13659, 910)  # 157x87 = 13659
+        self.fc1 = nn.Linear(6960, 910)  # 157x87 = 13659
         self.fc2 = nn.Linear(910, 60)
         self.fc3 = nn.Linear(60, 1)
 

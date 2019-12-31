@@ -58,6 +58,6 @@ MAX_THROTTLE_VAL = 1.0
 STRAIGHT_ANGLE = 90.0
 MAX_STEER_DEV = 40.0
 
-cap = cv2.VideoCapture(gstreamer_pipeline(), cv2.CAP_GSTREAMER)
+cap = cv2.VideoCapture(gstreamer_pipeline(128, 72, 128, 72), cv2.CAP_GSTREAMER)
 
 __servo_kit = ServoKit(channels=16)

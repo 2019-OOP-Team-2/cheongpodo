@@ -29,8 +29,7 @@ def steer_dampener(val: float) -> float:  # high val = left.
     if __dampener_coeff == 'not':
         __dampener_coeff = num_deg
     else:
-        num_deg = num_deg * 3 / 4 + __dampener_coeff / 4
-        __dampener_coeff = num_deg / 4 + __dampener_coeff * 3 / 4
+        num_deg = __dampener_coeff = num_deg / 8 + __dampener_coeff * 7 / 8
     return num_deg
 
 

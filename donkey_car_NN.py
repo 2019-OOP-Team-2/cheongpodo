@@ -54,7 +54,7 @@ try:
         b, g, r = torch.from_numpy(b), torch.from_numpy(g), torch.from_numpy(r)
         input_tensor = torch.cat((b.unsqueeze_(0), g.unsqueeze_(0), r.unsqueeze_(0))).unsqueeze_(0)
         optimizer.zero_grad()
-        inputs = Variable(input_tensor.cuda())
+        inputs = Variable(input_tensor.cuda()).float()
         in_char = getch()
         deg = 0
         cv.imshow('judge', raw_img)
@@ -62,7 +62,7 @@ try:
             deg = jm.MAX_STEER_DEV
         elif (in_char == 'd'):
             deg = -jm.MAX_STEER_DEV
-        label = Variable(torch.tensor([deg]).cuda()).float()
+        label = Variable(torch.tensor([deg]).cuda())
         outputs = net(inputs)
         loss = criterion(outputs, label)
         loss.backward()

@@ -30,7 +30,7 @@ class Net(nn.Module):  # 640 x 360 input
     def forward(self, x):
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
-        x = x.view(-1, 13659)
+        x = x.view(-1, 6960)
         x = F.relu(self.fc1(x))
         x = F.relu(self.fc2(x))
         x = self.fc3(x)

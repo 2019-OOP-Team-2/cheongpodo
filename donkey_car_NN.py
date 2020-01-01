@@ -43,9 +43,13 @@ class Net(nn.Module):  # 640 x 360 input
         return x
 
 
+def debug_print(a):
+    if debug:
+        print(a)
+
+
 net: Net = Net()
-net.cuda()
-criterion = nn.CrossEntropyLoss().cuda()
+criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 jm.set_throttle(0)
@@ -55,12 +59,6 @@ img = jm.cap
 
 debug = True
 
-
-def debug_print(a):
-    if debug:
-        print(a)
-
-
 try:
     while True:
         _, raw_img = img.read()
@@ -68,7 +66,7 @@ try:
         b, g, r = torch.from_numpy(b), torch.from_numpy(g), torch.from_numpy(r)
         input_tensor = torch.cat((b.unsqueeze_(0), g.unsqueeze_(0), r.unsqueeze_(0))).unsqueeze_(0)
         optimizer.zero_grad()
-        inputs = Variable(input_tensor.cuda()).float()
+        inputs = Variable(input_tensor).float()
         deg = 1  # straight
         cv.imshow('judge', raw_img)
         in_char = cv.waitKey(0)
@@ -78,11 +76,11 @@ try:
         elif in_char == 'd':
             deg = 0  # -jm.MAX_STEER_DEV
         debug_print(f'input: {in_char}')
-        label = Variable(torch.tensor([deg]).cuda(), requires_grad=False).long()
+        label = Variable(torch.tensor([deg])).long()
         outputs = net(inputs)
         debug_print(f'label: {label}')
         debug_print(f'output: {outputs}')
-        loss = criterion(outputs, label).cuda()
+        loss = criterion(outputs, label)
         loss.backward()
         optimizer.step()
 

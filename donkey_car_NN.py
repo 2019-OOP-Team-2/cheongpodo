@@ -84,9 +84,10 @@ try:
         elif in_char == 'd':
             deg = 0  # -jm.MAX_STEER_DEV
         debug_print(f'input: {in_char}')
-        label = Variable(torch.tensor([[deg]]).cuda(), requires_grad=False).long()
-        debug_print(f'label: {label}')
+        label = Variable(torch.tensor([deg]).cuda()).long()
         outputs = net(inputs)
+        outputs = outputs[0]
+        debug_print(f'label: {label}')
         debug_print(f'output: {outputs}')
         loss = criterion(outputs, label).cuda()
         loss.backward()

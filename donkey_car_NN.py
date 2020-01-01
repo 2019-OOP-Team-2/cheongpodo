@@ -1,3 +1,4 @@
+import os
 import time
 
 import cv2 as cv
@@ -27,11 +28,16 @@ class Net(nn.Module):  # 640 x 360 input
         self.fc3 = nn.Linear(60, 3)
 
     def forward(self, x):
+        debug_print(x)
         x = self.pool(F.relu(self.conv1(x)))
+        debug_print(x)
         x = self.pool(F.relu(self.conv2(x)))
+        debug_print(x)
         x = x.view(1, -1)
         x = F.relu(self.fc1(x))
+        debug_print(x)
         x = F.relu(self.fc2(x))
+        debug_print(x)
         x = self.fc3(x)
         return x
 
@@ -60,7 +66,6 @@ try:
         input_tensor = torch.cat((b.unsqueeze_(0), g.unsqueeze_(0), r.unsqueeze_(0))).unsqueeze_(0)
         optimizer.zero_grad()
         inputs = Variable(input_tensor.cuda()).float()
-        debug_print(inputs)
         deg = 1  # straight
         cv.imshow('judge', raw_img)
 
@@ -71,11 +76,11 @@ try:
             deg = 2  # -jm.MAX_STEER_DEV
         elif in_char == ord('w'):
             learn = False
-
+        os.system('clear')
         debug_print(f'input: {in_char}')
         label = Variable(torch.tensor([deg]).cuda()).long()
-        outputs = net(inputs)
         debug_print(f'label: {label}')
+        outputs = net(inputs)
         debug_print(f'output: {outputs}')
 
         if learn:

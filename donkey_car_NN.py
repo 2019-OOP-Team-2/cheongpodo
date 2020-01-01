@@ -86,7 +86,6 @@ try:
         debug_print(f'input: {in_char}')
         label = Variable(torch.tensor([deg]).cuda()).long()
         outputs = net(inputs)
-        outputs = outputs[0]
         debug_print(f'label: {label}')
         debug_print(f'output: {outputs}')
         loss = criterion(outputs, label).cuda()

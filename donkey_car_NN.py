@@ -8,7 +8,6 @@ import torch.optim as optim
 from torch.autograd import Variable
 
 import jetson_nano_move as jm
-from console_input import getch
 
 
 def finish_program(video_capture: cv.VideoCapture) -> None:
@@ -52,7 +51,7 @@ time.sleep(1)
 img = jm.cap
 
 debug = True
-
+learn = True
 try:
     while True:
         _, raw_img = img.read()
@@ -63,20 +62,25 @@ try:
         inputs = Variable(input_tensor.cuda()).float()
         deg = 1  # straight
         cv.imshow('judge', raw_img)
-        cv.waitKey(1)
-        in_char = getch()
+
+        in_char = cv.waitKey(1)  # getch()
         if in_char == 'a':
             deg = 0  # jm.MAX_STEER_DEV
         elif in_char == 'd':
             deg = 2  # -jm.MAX_STEER_DEV
+        elif in_char == 'w':
+            learn = False
+
         debug_print(f'input: {in_char}')
         label = Variable(torch.tensor([deg]).cuda()).long()
         outputs = net(inputs)
         debug_print(f'label: {label}')
         debug_print(f'output: {outputs}')
-        loss = criterion(outputs, label).cuda()
-        loss.backward()
-        optimizer.step()
+
+        if learn:
+            loss = criterion(outputs, label).cuda()
+            loss.backward()
+            optimizer.step()
 
 except KeyboardInterrupt:
     print('ctrl + C trapped')

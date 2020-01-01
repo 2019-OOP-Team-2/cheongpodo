@@ -64,11 +64,11 @@ try:
         cv.imshow('judge', raw_img)
 
         in_char = cv.waitKey(1)  # getch()
-        if in_char == 'a':
+        if in_char == ord('a'):
             deg = 0  # jm.MAX_STEER_DEV
-        elif in_char == 'd':
+        elif in_char == ord('d'):
             deg = 2  # -jm.MAX_STEER_DEV
-        elif in_char == 'w':
+        elif in_char == ord('w'):
             learn = False
 
         debug_print(f'input: {in_char}')

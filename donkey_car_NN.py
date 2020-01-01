@@ -23,17 +23,24 @@ class Net(nn.Module):  # 640 x 360 input
         self.conv1 = nn.Conv2d(3, 6, 5)
         self.conv2 = nn.Conv2d(6, 16, 5)
         self.pool = nn.MaxPool2d(2, 2)
-        self.fc1 = nn.Linear(6960, 910)  # 157x87 = 13659
+        self.fc1 = nn.Linear(6960, 910)
         self.fc2 = nn.Linear(910, 60)
         self.fc3 = nn.Linear(60, 1)
 
     def forward(self, x):
+        debug_print('size of x: ')
         x = self.pool(F.relu(self.conv1(x)))
+        debug_print(x.size())
         x = self.pool(F.relu(self.conv2(x)))
+        debug_print(x.size())
         x = x.view(-1, 6960)
+        debug_print(x.size())
         x = F.relu(self.fc1(x))
+        debug_print(x.size())
         x = F.relu(self.fc2(x))
+        debug_print(x.size())
         x = self.fc3(x)
+        debug_print(x.size())
         return x
 
 
@@ -79,7 +86,7 @@ try:
         label = Variable(torch.tensor([deg]).cuda()).long()
         outputs = net(inputs)
         debug_print(f'output: {outputs}')
-        loss = criterion(outputs, label)
+        loss = criterion(outputs, label).cuda()
         loss.backward()
         optimizer.step()
 

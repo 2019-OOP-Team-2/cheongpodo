@@ -8,6 +8,7 @@ import torch.optim as optim
 from torch.autograd import Variable
 
 import jetson_nano_move as jm
+from console_input import getch
 
 
 def finish_program(video_capture: cv.VideoCapture) -> None:
@@ -69,7 +70,8 @@ try:
         inputs = Variable(input_tensor).float()
         deg = 1  # straight
         cv.imshow('judge', raw_img)
-        in_char = cv.waitKey(0)
+        cv.waitKey(1)
+        in_char = getch()
         cv.destroyAllWindows()
         if in_char == 'a':
             deg = 2  # jm.MAX_STEER_DEV

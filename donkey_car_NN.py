@@ -28,16 +28,11 @@ class Net(nn.Module):  # 640 x 360 input
         self.fc3 = nn.Linear(60, 3)
 
     def forward(self, x):
-        debug_print(x)
         x = self.pool(F.relu(self.conv1(x)))
-        debug_print(x)
         x = self.pool(F.relu(self.conv2(x)))
-        debug_print(x)
         x = x.view(1, -1)
         x = F.relu(self.fc1(x))
-        debug_print(x)
         x = F.relu(self.fc2(x))
-        debug_print(x)
         x = self.fc3(x)
         return x
 
@@ -47,7 +42,8 @@ def debug_print(a):
         print(a)
 
 
-net: Net = Net().cuda()
+net: Net = Net()
+net.cuda()
 criterion = nn.CrossEntropyLoss().cuda()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 

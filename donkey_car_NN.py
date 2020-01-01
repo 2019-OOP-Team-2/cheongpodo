@@ -2,6 +2,7 @@ import os
 import time
 
 import cv2 as cv
+import numpy
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -54,12 +55,30 @@ img = jm.cap
 
 debug = True
 learn = True
+
+
+def cv2img2tensor(image):
+    tensor_img = numpy.transpose(image, (2, 0, 1))
+    tensor_img = torch.from_numpy(tensor_img)
+    return tensor_img.unsqueeze_(0)
+
+
+_, img1 = img.read()
+time.sleep(10)
+
+_, img2 = img.read()
+cv.imshow('a', img1)
+cv.imshow('b', img2)
+img1 = Variable(cv2img2tensor(img1).cuda())
+img2 = Variable(cv2img2tensor(img2).cuda())
+print(net(img1), net(img2))
+cv.waitKey(0)
+exit()
+
 try:
     while True:
         _, raw_img = img.read()
-        b, g, r = cv.split(raw_img)
-        b, g, r = torch.from_numpy(b), torch.from_numpy(g), torch.from_numpy(r)
-        input_tensor = torch.cat((b.unsqueeze_(0), g.unsqueeze_(0), r.unsqueeze_(0))).unsqueeze_(0)
+        input_tensor = cv2img2tensor(raw_img)
         optimizer.zero_grad()
         inputs = Variable(input_tensor.cuda()).float()
         deg = 1  # straight

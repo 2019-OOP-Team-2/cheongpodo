@@ -47,12 +47,24 @@ time.sleep(1)
 # camera init
 img = jm.cap
 
+debug = True
+
+
+def debug_print(a):
+    if debug:
+        print(a)
+
+
 try:
     while True:
         _, raw_img = img.read()
+        debug_print('img read')
         b, g, r = cv.split(raw_img)
+        debug_print('img split')
         b, g, r = torch.from_numpy(b), torch.from_numpy(g), torch.from_numpy(r)
+        debug_print('img tensorified')
         input_tensor = torch.cat((b.unsqueeze_(0), g.unsqueeze_(0), r.unsqueeze_(0))).unsqueeze_(0)
+        debug_print('img merged: 3 channels')
         optimizer.zero_grad()
         inputs = Variable(input_tensor.cuda()).float()
         deg = 0
@@ -63,8 +75,10 @@ try:
             deg = jm.MAX_STEER_DEV
         elif in_char == 'd':
             deg = -jm.MAX_STEER_DEV
+        debug_print(f'input: {in_char}')
         label = Variable(torch.tensor([deg]).cuda()).long()
         outputs = net(inputs)
+        debug_print(f'output: {outputs}')
         loss = criterion(outputs, label)
         loss.backward()
         optimizer.step()

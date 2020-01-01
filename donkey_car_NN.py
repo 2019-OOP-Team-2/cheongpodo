@@ -8,7 +8,6 @@ import torch.optim as optim
 from torch.autograd import Variable
 
 import jetson_nano_move as jm
-from console_input import getch
 
 
 def finish_program(video_capture: cv.VideoCapture) -> None:
@@ -33,7 +32,7 @@ class Net(nn.Module):  # 640 x 360 input
         debug_print(x.size())
         x = self.pool(F.relu(self.conv2(x)))
         debug_print(x.size())
-        x = x.view(-1, 6960)
+        x = x.view(1, -1)
         debug_print(x.size())
         x = F.relu(self.fc1(x))
         debug_print(x.size())
@@ -65,26 +64,21 @@ def debug_print(a):
 try:
     while True:
         _, raw_img = img.read()
-        debug_print('img read')
         b, g, r = cv.split(raw_img)
-        debug_print('img split')
         b, g, r = torch.from_numpy(b), torch.from_numpy(g), torch.from_numpy(r)
-        debug_print('img tensorified')
         input_tensor = torch.cat((b.unsqueeze_(0), g.unsqueeze_(0), r.unsqueeze_(0))).unsqueeze_(0)
-        debug_print('img merged: 3 channels')
         optimizer.zero_grad()
         inputs = Variable(input_tensor.cuda()).float()
         deg = 1  # straight
         cv.imshow('judge', raw_img)
-        cv.waitKey(1)
-        in_char = getch()
+        in_char = cv.waitKey(0)
         cv.destroyAllWindows()
         if in_char == 'a':
             deg = 2  # jm.MAX_STEER_DEV
         elif in_char == 'd':
             deg = 0  # -jm.MAX_STEER_DEV
         debug_print(f'input: {in_char}')
-        label = Variable(torch.tensor([deg]).cuda()).long()
+        label = Variable(torch.tensor([deg]).cuda(), requires_grad=False).long()
         outputs = net(inputs)
         debug_print(f'label: {label}')
         debug_print(f'output: {outputs}')

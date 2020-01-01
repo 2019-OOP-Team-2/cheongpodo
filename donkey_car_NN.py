@@ -8,7 +8,6 @@ import torch.optim as optim
 from torch.autograd import Variable
 
 import jetson_nano_move as jm
-from console_input import getch
 
 
 def finish_program(video_capture: cv.VideoCapture) -> None:
@@ -25,7 +24,7 @@ class Net(nn.Module):  # 640 x 360 input
         self.pool = nn.MaxPool2d(2, 2)
         self.fc1 = nn.Linear(6960, 910)
         self.fc2 = nn.Linear(910, 60)
-        self.fc3 = nn.Linear(60, 1)
+        self.fc3 = nn.Linear(60, 3)
 
     def forward(self, x):
         debug_print('size of x: ')
@@ -68,17 +67,17 @@ try:
         input_tensor = torch.cat((b.unsqueeze_(0), g.unsqueeze_(0), r.unsqueeze_(0))).unsqueeze_(0)
         optimizer.zero_grad()
         inputs = Variable(input_tensor).float()
-        deg = 1  # straight
+        deg = [0, 1, 0]  # straight
         cv.imshow('judge', raw_img)
-        cv.waitKey(1)
-        in_char = getch()
+
+        in_char = cv.waitKey(1)
         cv.destroyAllWindows()
-        if in_char == 'a':
-            deg = 2  # jm.MAX_STEER_DEV
-        elif in_char == 'd':
-            deg = 0  # -jm.MAX_STEER_DEV
+        if in_char == ord('a'):
+            deg = [1, 0, 0]  # jm.MAX_STEER_DEV
+        elif in_char == ord('d'):
+            deg = [0, 0, 1]  # -jm.MAX_STEER_DEV
         debug_print(f'input: {in_char}')
-        label = Variable(torch.tensor([deg])).long()
+        label = Variable(torch.tensor(deg)).long()
         outputs = net(inputs)
         debug_print(f'label: {label}')
         debug_print(f'output: {outputs}')

@@ -39,7 +39,7 @@ class Net(nn.Module):  # 640 x 360 input
 
 net: Net = Net()
 net.cuda()
-criterion = nn.CrossEntropyLoss()
+criterion = nn.CrossEntropyLoss().cuda()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
 jm.set_throttle(0)
@@ -58,9 +58,9 @@ try:
         in_char = getch()
         deg = 0
         cv.imshow('judge', raw_img)
-        if (in_char == 'a'):
+        if in_char == 'a':
             deg = jm.MAX_STEER_DEV
-        elif (in_char == 'd'):
+        elif in_char == 'd':
             deg = -jm.MAX_STEER_DEV
         label = Variable(torch.tensor([deg]).cuda()).long()
         outputs = net(inputs)

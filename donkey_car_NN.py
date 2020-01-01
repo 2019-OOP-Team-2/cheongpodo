@@ -39,7 +39,7 @@ class Net(nn.Module):  # 640 x 360 input
         debug_print(x.size())
         x = F.relu(self.fc2(x))
         debug_print(x.size())
-        x = self.fc3(x)
+        x = F.relu(self.fc3(x))
         debug_print(x.size())
         return x
 
@@ -84,7 +84,7 @@ try:
         elif in_char == 'd':
             deg = 0  # -jm.MAX_STEER_DEV
         debug_print(f'input: {in_char}')
-        label = Variable(torch.tensor([deg]).cuda(), requires_grad=False).long()
+        label = Variable(torch.tensor([[deg]]).cuda(), requires_grad=False).long()
         debug_print(f'label: {label}')
         outputs = net(inputs)
         debug_print(f'output: {outputs}')

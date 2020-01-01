@@ -78,12 +78,13 @@ try:
         cv.imshow('judge', raw_img)
         cv.waitKey(1)
         in_char = getch()
+        cv.destroyAllWindows()
         if in_char == 'a':
             deg = 1  # jm.MAX_STEER_DEV
         elif in_char == 'd':
             deg = -1  # -jm.MAX_STEER_DEV
         debug_print(f'input: {in_char}')
-        label = Variable(torch.tensor([deg]).cuda(), gradient_required=False).long()
+        label = Variable(torch.tensor([deg]).cuda(), requires_grad=False).long()
         debug_print(f'label: {label}')
         outputs = net(inputs)
         debug_print(f'output: {outputs}')

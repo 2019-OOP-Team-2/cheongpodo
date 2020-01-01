@@ -27,19 +27,12 @@ class Net(nn.Module):  # 640 x 360 input
         self.fc3 = nn.Linear(60, 3)
 
     def forward(self, x):
-        debug_print('size of x: ')
         x = self.pool(F.relu(self.conv1(x)))
-        debug_print(x.size())
         x = self.pool(F.relu(self.conv2(x)))
-        debug_print(x.size())
         x = x.view(1, -1)
-        debug_print(x.size())
         x = F.relu(self.fc1(x))
-        debug_print(x.size())
         x = F.relu(self.fc2(x))
-        debug_print(x.size())
-        x = F.relu(self.fc3(x))
-        debug_print(x.size())
+        x = self.fc3(x)
         return x
 
 
@@ -67,17 +60,16 @@ try:
         input_tensor = torch.cat((b.unsqueeze_(0), g.unsqueeze_(0), r.unsqueeze_(0))).unsqueeze_(0)
         optimizer.zero_grad()
         inputs = Variable(input_tensor).float()
-        deg = [0, 1, 0]  # straight
+        deg = 1  # straight
         cv.imshow('judge', raw_img)
 
         in_char = cv.waitKey(1)
-        cv.destroyAllWindows()
         if in_char == ord('a'):
-            deg = [1, 0, 0]  # jm.MAX_STEER_DEV
+            deg = 0  # jm.MAX_STEER_DEV
         elif in_char == ord('d'):
-            deg = [0, 0, 1]  # -jm.MAX_STEER_DEV
+            deg = 2  # -jm.MAX_STEER_DEV
         debug_print(f'input: {in_char}')
-        label = Variable(torch.tensor(deg)).long()
+        label = Variable(torch.tensor([deg])).long()
         outputs = net(inputs)
         debug_print(f'label: {label}')
         debug_print(f'output: {outputs}')

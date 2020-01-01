@@ -60,6 +60,7 @@ try:
         input_tensor = torch.cat((b.unsqueeze_(0), g.unsqueeze_(0), r.unsqueeze_(0))).unsqueeze_(0)
         optimizer.zero_grad()
         inputs = Variable(input_tensor.cuda()).float()
+        debug_print(inputs)
         deg = 1  # straight
         cv.imshow('judge', raw_img)
 

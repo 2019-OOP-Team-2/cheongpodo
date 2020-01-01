@@ -79,11 +79,12 @@ try:
         cv.waitKey(1)
         in_char = getch()
         if in_char == 'a':
-            deg = jm.MAX_STEER_DEV
+            deg = 1  # jm.MAX_STEER_DEV
         elif in_char == 'd':
-            deg = -jm.MAX_STEER_DEV
+            deg = -1  # -jm.MAX_STEER_DEV
         debug_print(f'input: {in_char}')
-        label = Variable(torch.tensor([deg]).cuda()).long()
+        label = Variable(torch.tensor([deg]).cuda(), gradient_required=False).long()
+        debug_print(f'label: {label}')
         outputs = net(inputs)
         debug_print(f'output: {outputs}')
         loss = criterion(outputs, label).cuda()

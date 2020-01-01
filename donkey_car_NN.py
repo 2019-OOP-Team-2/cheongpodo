@@ -74,15 +74,15 @@ try:
         debug_print('img merged: 3 channels')
         optimizer.zero_grad()
         inputs = Variable(input_tensor.cuda()).float()
-        deg = 0
+        deg = 1  # straight
         cv.imshow('judge', raw_img)
         cv.waitKey(1)
         in_char = getch()
         cv.destroyAllWindows()
         if in_char == 'a':
-            deg = 1  # jm.MAX_STEER_DEV
+            deg = 2  # jm.MAX_STEER_DEV
         elif in_char == 'd':
-            deg = -1  # -jm.MAX_STEER_DEV
+            deg = 0  # -jm.MAX_STEER_DEV
         debug_print(f'input: {in_char}')
         label = Variable(torch.tensor([deg]).cuda(), requires_grad=False).long()
         debug_print(f'label: {label}')

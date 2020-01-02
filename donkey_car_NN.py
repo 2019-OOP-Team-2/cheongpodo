@@ -82,6 +82,7 @@ def real_action():
     input_tensor = cv2img2tensor(raw_img)
     output = net(Variable(input_tensor.cuda()).float())
     output = torch.argmax(output)
+    print(output)
     if output == 0:
         jm.set_angle(130)
     elif output == 1:

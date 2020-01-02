@@ -114,11 +114,11 @@ def learning_stage() -> bool:
     elif in_char == ord('d'):
         now_dir = 2  # -jm.MAX_STEER_DEV
         jm.set_angle(50)
-    elif in_char == ord('w'):
-        return True
     elif in_char == ord('s'):
         now_dir = 1  # straight
         jm.set_angle(90)
+    elif in_char == ord('w'):
+        return True
     debug_print(f'\n\ninput: {in_char}')
     label = Variable(torch.tensor([now_dir]).cuda(), requires_grad=False).long()
     debug_print(f'label: {label}')

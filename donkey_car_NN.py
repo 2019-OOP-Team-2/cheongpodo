@@ -54,6 +54,7 @@ criterion = nn.CrossEntropyLoss().cuda()
 optimizer = optim.SGD(net.parameters(), lr=0.0001, momentum=0.5)
 
 jm.set_throttle(0)
+run_throttle = 0.15
 time.sleep(1)
 # camera init
 img = jm.cap
@@ -71,7 +72,7 @@ def main_loop():
     jm.set_angle(90)
     time.sleep(5)
     if not debug:
-        jm.set_throttle(0.12)
+        jm.set_throttle(run_throttle)
 
     while True:
         real_action()
@@ -122,7 +123,7 @@ def learning_stage() -> bool:
     debug_print(f'label: {label}')
     outputs = net(inputs)
     if not debug:
-        jm.set_throttle(0.12)
+        jm.set_throttle(run_throttle)
     debug_print(f'output: {outputs}')
     optimizer.zero_grad()
     loss = criterion(outputs, label).cuda()

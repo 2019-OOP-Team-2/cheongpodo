@@ -1,7 +1,6 @@
 import time
 
 import cv2 as cv
-import matplotlib.pyplot as plt
 import numpy
 import torch
 import torch.nn as nn
@@ -98,7 +97,11 @@ def real_action():
         print('GO_RIGHT')
 
 
+now_dir = 1
+
+
 def learning_stage() -> bool:
+    global now_dir
     _, raw_img = img.read()
     input_tensor = cv2img2tensor(raw_img)
     inputs = Variable(input_tensor.cuda()).float()
@@ -106,17 +109,18 @@ def learning_stage() -> bool:
     plt.imshow(raw_img)
     in_char = cv.waitKey(1)  # getch()
     if in_char == ord('a'):
-        deg = 0  # jm.MAX_STEER_DEV
+        now_dir = 0  # jm.MAX_STEER_DEV
         jm.set_angle(130)
     elif in_char == ord('d'):
-        deg = 2  # -jm.MAX_STEER_DEV
+        now_dir = 2  # -jm.MAX_STEER_DEV
         jm.set_angle(50)
     elif in_char == ord('w'):
         return True
-    else:
+    elif in_char == ord('s'):
+        now_dir = 1  # straight
         jm.set_angle(90)
     debug_print(f'\n\ninput: {in_char}')
-    label = Variable(torch.tensor([deg]).cuda(), requires_grad=False).long()
+    label = Variable(torch.tensor([now_dir]).cuda(), requires_grad=False).long()
     debug_print(f'label: {label}')
     outputs = net(inputs)
     debug_print(f'output: {outputs}')

@@ -101,7 +101,7 @@ now_dir = 1
 
 
 def learning_stage() -> bool:
-    global now_dir
+    global now_dir, run_throttle
     _, raw_img = img.read()
     input_tensor = cv2img2tensor(raw_img)
     inputs = Variable(input_tensor.cuda()).float()
@@ -116,6 +116,10 @@ def learning_stage() -> bool:
     elif in_char == ord('d'):
         now_dir = 2  # -jm.MAX_STEER_DEV
         jm.set_angle(50)
+    elif in_char == ord('i'):
+        run_throttle += 0.01
+    elif in_char == ord('k'):
+        run_throttle -= 0.01
     elif in_char == ord('w'):
         return True
     debug_print(f'\n\ninput: {in_char}')

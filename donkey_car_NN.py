@@ -51,7 +51,7 @@ def cv2img2tensor(image):
 net: Net = Net()
 net.cuda()
 criterion = nn.CrossEntropyLoss().cuda()
-optimizer = optim.SGD(net.parameters(), lr=0, momentum=0.7)
+optimizer = optim.SGD(net.parameters(), lr=0.00001, momentum=0.5)
 
 jm.set_throttle(0)
 time.sleep(1)

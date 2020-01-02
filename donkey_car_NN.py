@@ -51,7 +51,7 @@ def cv2img2tensor(image):
 net: Net = Net()
 net.cuda()
 criterion = nn.CrossEntropyLoss().cuda()
-optimizer = optim.SGD(net.parameters(), lr=0.00001, momentum=0.7)
+optimizer = optim.SGD(net.parameters(), lr=0, momentum=0.7)
 
 jm.set_throttle(0)
 time.sleep(1)
@@ -84,19 +84,18 @@ def real_action():
     cv.imshow('cam', raw_img)
     cv.waitKey(1)
     input_tensor = cv2img2tensor(raw_img)
-    print('\n\n')
     output = net(Variable(input_tensor.cuda(), requires_grad=False).float())
     debug_print(f'output: {output}')
     output = torch.argmax(output)
     if output == 0:
         jm.set_angle(130)
-        print('LEFT')
+        debug_print('LEFT')
     elif output == 1:
         jm.set_angle(90)
-        print('STRAIGHT')
+        debug_print('STRAIGHT')
     elif output == 2:
         jm.set_angle(50)
-        print('RIGHT')
+        debug_print('RIGHT')
 
 
 now_dir = 1

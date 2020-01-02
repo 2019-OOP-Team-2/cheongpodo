@@ -1,4 +1,3 @@
-import os
 import time
 
 import cv2 as cv
@@ -63,6 +62,8 @@ debug = True
 
 
 def main_loop():
+    if not debug:
+        jm.set_throttle(0.12)
     while True:
         if learning_stage():
             break
@@ -71,7 +72,8 @@ def main_loop():
     jm.set_throttle(0)
     jm.set_angle(90)
     time.sleep(5)
-    jm.set_throttle(0.12)
+    if not debug:
+        jm.set_throttle(0.12)
 
     while True:
         real_action()
@@ -79,6 +81,7 @@ def main_loop():
 
 def real_action():
     _, raw_img = img.read()
+    cv.imshow('cam', raw_img)
     input_tensor = cv2img2tensor(raw_img)
     output = net(Variable(input_tensor.cuda()).float())
     output = torch.argmax(output)
@@ -109,8 +112,7 @@ def learning_stage() -> bool:
         return True
     else:
         jm.set_angle(90)
-    os.system('clear')
-    debug_print(f'input: {in_char}')
+    debug_print(f'\n\ninput: {in_char}')
     label = Variable(torch.tensor([deg]).cuda()).long()
     debug_print(f'label: {label}')
     outputs = net(inputs)

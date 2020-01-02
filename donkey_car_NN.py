@@ -43,6 +43,12 @@ def debug_print(a):
         print(a)
 
 
+def cv2img2tensor(image):
+    tensor_img = numpy.transpose(image, (2, 0, 1))
+    tensor_img = torch.from_numpy(tensor_img)
+    return tensor_img.unsqueeze_(0)
+
+
 net: Net = Net()
 net.cuda()
 criterion = nn.CrossEntropyLoss().cuda()
@@ -54,55 +60,68 @@ time.sleep(1)
 img = jm.cap
 
 debug = True
-learn = True
 
 
-def cv2img2tensor(image):
-    tensor_img = numpy.transpose(image, (2, 0, 1))
-    tensor_img = torch.from_numpy(tensor_img)
-    return tensor_img.unsqueeze_(0)
+def main_loop():
+    while True:
+        if learning_stage():
+            break
+
+    cv.destroyAllWindows()
+    jm.set_throttle(0)
+    jm.set_angle(90)
+    time.sleep(5)
+    jm.set_throttle(0.12)
+
+    while True:
+        real_action()
 
 
-_, img1 = img.read()
-time.sleep(10)
+def real_action():
+    _, raw_img = img.read()
+    input_tensor = cv2img2tensor(raw_img)
+    output = net(Variable(input_tensor.cuda()).float())
+    output = torch.argmax(output)
+    if output == 0:
+        jm.set_angle(130)
+    elif output == 1:
+        jm.set_angle(90)
+    elif output == 2:
+        jm.set_angle(50)
 
-_, img2 = img.read()
-cv.imshow('a', img1)
-cv.imshow('b', img2)
-img1 = Variable(cv2img2tensor(img1).cuda())
-img2 = Variable(cv2img2tensor(img2).cuda())
-print(net(img1), net(img2))
-cv.waitKey(0)
-exit()
+
+def learning_stage() -> bool:
+    _, raw_img = img.read()
+    input_tensor = cv2img2tensor(raw_img)
+    optimizer.zero_grad()
+    inputs = Variable(input_tensor.cuda()).float()
+    deg = 1  # straight
+    cv.imshow('judge', raw_img)
+    in_char = cv.waitKey(1)  # getch()
+    if in_char == ord('a'):
+        deg = 0  # jm.MAX_STEER_DEV
+        jm.set_angle(130)
+    elif in_char == ord('d'):
+        deg = 2  # -jm.MAX_STEER_DEV
+        jm.set_angle(50)
+    elif in_char == ord('w'):
+        return True
+    else:
+        jm.set_angle(90)
+    os.system('clear')
+    debug_print(f'input: {in_char}')
+    label = Variable(torch.tensor([deg]).cuda()).long()
+    debug_print(f'label: {label}')
+    outputs = net(inputs)
+    debug_print(f'output: {outputs}')
+    loss = criterion(outputs, label).cuda()
+    loss.backward()
+    optimizer.step()
+    return False
+
 
 try:
-    while True:
-        _, raw_img = img.read()
-        input_tensor = cv2img2tensor(raw_img)
-        optimizer.zero_grad()
-        inputs = Variable(input_tensor.cuda()).float()
-        deg = 1  # straight
-        cv.imshow('judge', raw_img)
-
-        in_char = cv.waitKey(1)  # getch()
-        if in_char == ord('a'):
-            deg = 0  # jm.MAX_STEER_DEV
-        elif in_char == ord('d'):
-            deg = 2  # -jm.MAX_STEER_DEV
-        elif in_char == ord('w'):
-            learn = False
-        os.system('clear')
-        debug_print(f'input: {in_char}')
-        label = Variable(torch.tensor([deg]).cuda()).long()
-        debug_print(f'label: {label}')
-        outputs = net(inputs)
-        debug_print(f'output: {outputs}')
-
-        if learn:
-            loss = criterion(outputs, label).cuda()
-            loss.backward()
-            optimizer.step()
-
+    main_loop()
 except KeyboardInterrupt:
     print('ctrl + C trapped')
 

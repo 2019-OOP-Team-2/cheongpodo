@@ -1,6 +1,7 @@
 import time
 
 import cv2 as cv
+import matplotlib.pyplot as plt
 import numpy
 import torch
 import torch.nn as nn
@@ -59,6 +60,7 @@ time.sleep(1)
 img = jm.cap
 
 debug = True
+plt.ion()
 
 
 def main_loop():
@@ -81,19 +83,20 @@ def main_loop():
 
 def real_action():
     _, raw_img = img.read()
-    cv.imshow('cam', raw_img)
-    cv.waitKey(1)
+    plt.imshow(raw_img)
     input_tensor = cv2img2tensor(raw_img)
     print('\n\n')
     output = net(Variable(input_tensor.cuda(), requires_grad=False).float())
     output = torch.argmax(output)
-    print(output)
     if output == 0:
         jm.set_angle(130)
+        print('GO_LEFT')
     elif output == 1:
         jm.set_angle(90)
+        print('GO_STRAIGHT')
     elif output == 2:
         jm.set_angle(50)
+        print('GO_RIGHT')
 
 
 def learning_stage() -> bool:
@@ -101,7 +104,7 @@ def learning_stage() -> bool:
     input_tensor = cv2img2tensor(raw_img)
     inputs = Variable(input_tensor.cuda()).float()
     deg = 1  # straight
-    cv.imshow('judge', raw_img)
+    plt.imshow(raw_img)
     in_char = cv.waitKey(1)  # getch()
     if in_char == ord('a'):
         deg = 0  # jm.MAX_STEER_DEV

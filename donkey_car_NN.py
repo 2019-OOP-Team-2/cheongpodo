@@ -85,9 +85,7 @@ def real_action():
     cv.waitKey(1)
     input_tensor = cv2img2tensor(raw_img)
     print('\n\n')
-    print(input_tensor)
     output = net(Variable(input_tensor.cuda(), requires_grad=False).float())
-    print(output)
     output = torch.argmax(output)
     print(output)
     if output == 0:

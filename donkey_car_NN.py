@@ -51,7 +51,7 @@ def cv2img2tensor(image):
 net: Net = Net()
 net.cuda()
 criterion = nn.CrossEntropyLoss().cuda()
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+optimizer = optim.SGD(net.parameters(), lr=0.00001, momentum=0.7)
 
 jm.set_throttle(0)
 time.sleep(1)
@@ -86,6 +86,7 @@ def real_action():
     input_tensor = cv2img2tensor(raw_img)
     print('\n\n')
     output = net(Variable(input_tensor.cuda(), requires_grad=False).float())
+    debug_print(f'output: {output}')
     output = torch.argmax(output)
     if output == 0:
         jm.set_angle(130)
@@ -111,12 +112,12 @@ def learning_stage() -> bool:
     if in_char == ord('a'):
         now_dir = 0  # jm.MAX_STEER_DEV
         jm.set_angle(130)
-    elif in_char == ord('d'):
-        now_dir = 2  # -jm.MAX_STEER_DEV
-        jm.set_angle(50)
     elif in_char == ord('s'):
         now_dir = 1  # straight
         jm.set_angle(90)
+    elif in_char == ord('d'):
+        now_dir = 2  # -jm.MAX_STEER_DEV
+        jm.set_angle(50)
     elif in_char == ord('w'):
         return True
     debug_print(f'\n\ninput: {in_char}')

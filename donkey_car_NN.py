@@ -118,8 +118,12 @@ def learning_stage() -> bool:
         jm.set_angle(50)
     elif in_char == ord('i'):
         run_throttle += 0.01
+        if run_throttle > 1:
+            run_throttle = 1
     elif in_char == ord('k'):
         run_throttle -= 0.01
+        if run_throttle < 0:
+            run_throttle = 0
     elif in_char == ord('w'):
         return True
     debug_print(f'\n\ninput: {in_char}')

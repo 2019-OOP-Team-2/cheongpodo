@@ -62,8 +62,6 @@ debug = False
 
 
 def main_loop():
-    if not debug:
-        jm.set_throttle(0.12)
     while True:
         if learning_stage():
             break
@@ -123,6 +121,8 @@ def learning_stage() -> bool:
     label = Variable(torch.tensor([now_dir]).cuda(), requires_grad=False).long()
     debug_print(f'label: {label}')
     outputs = net(inputs)
+    if not debug:
+        jm.set_throttle(0.12)
     debug_print(f'output: {outputs}')
     optimizer.zero_grad()
     loss = criterion(outputs, label).cuda()

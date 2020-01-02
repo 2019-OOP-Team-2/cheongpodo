@@ -60,7 +60,6 @@ time.sleep(1)
 img = jm.cap
 
 debug = True
-plt.ion()
 
 
 def main_loop():

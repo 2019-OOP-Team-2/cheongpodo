@@ -100,7 +100,6 @@ def real_action():
 def learning_stage() -> bool:
     _, raw_img = img.read()
     input_tensor = cv2img2tensor(raw_img)
-    optimizer.zero_grad()
     inputs = Variable(input_tensor.cuda()).float()
     deg = 1  # straight
     cv.imshow('judge', raw_img)
@@ -116,10 +115,11 @@ def learning_stage() -> bool:
     else:
         jm.set_angle(90)
     debug_print(f'\n\ninput: {in_char}')
-    label = Variable(torch.tensor([deg]).cuda()).long()
+    label = Variable(torch.tensor([deg]).cuda(), requires_grad=False).long()
     debug_print(f'label: {label}')
     outputs = net(inputs)
     debug_print(f'output: {outputs}')
+    optimizer.zero_grad()
     loss = criterion(outputs, label).cuda()
     loss.backward()
     optimizer.step()

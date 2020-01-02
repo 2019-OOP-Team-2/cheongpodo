@@ -82,8 +82,11 @@ def main_loop():
 def real_action():
     _, raw_img = img.read()
     cv.imshow('cam', raw_img)
+    cv.waitKey(1)
     input_tensor = cv2img2tensor(raw_img)
     output = net(Variable(input_tensor.cuda()).float())
+    print('\n\n')
+    print(output)
     output = torch.argmax(output)
     print(output)
     if output == 0:

@@ -8,4 +8,4 @@ with opencv and python
 >
 >팀명: 뿅
 >
->ㅎㅎ
+>
